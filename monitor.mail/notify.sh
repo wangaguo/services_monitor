@@ -1,14 +1,14 @@
 #!/bin/sh
 
 cd `realpath $0 | xargs dirname`
-
-logfile=log/notify.log
+logdir="log"
+logfile="$logdir/notify.log"
 date >> $logfile
 
 datestr=`date`
-msg="$datestr: "$1"services have some problems!"
+msg="$datestr: '$*' services have some problems!"
 
-echo $msg | mail -s alert! "email@domain.com" 
-date >> $logfile
-
-
+subject="[Monitor] services warning"
+contact="user1@email.com, user2@email.com"
+echo $msg | mail -s "$subject" $contact 
+echo "Done!!" >> $logfile
