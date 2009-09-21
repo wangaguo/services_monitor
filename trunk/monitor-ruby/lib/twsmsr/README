@@ -1,0 +1,18 @@
+= TWSMSR 
+TWSMS is a SMS Service Company in Taiwan.
+And TWSMSR is a sender library for Ruby to easy use SMS service.
+
+= Usage
+
+require 'twsmsr'
+t = TWSMSR.new(username, password)
+resp = t.send(tel, message) # Get response, if resp is less than 0, it means it got an error! If response is greater than 0, that means the response is the message id.
+puts t.query # Get error check.
+puts t.message_id # Get message id.
+t.message_id = "123456" # Set Message ID
+puts t.query
+
+
+
+= Support
+You can mail to CFC (cfcsky@gmail.com) to report issues.
