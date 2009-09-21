@@ -1,0 +1,22 @@
+subject: "Monitor warning"
+email_from: "Monitor<contact@example.org>"
+email_to: "name@example.com"
+
+plurk_account: "my_account"
+plurk_password: "my_password"
+plurk_users: [user1id, user2id]
+
+msn_account: "my_account" 
+msn_password: "my_password"
+msn_users: ["user1@msn.com", "user2@msn.com"]
+
+sms_account: "my_account"
+sms_password: "my_password"
+sms_users: ["09xxxxxxx1", "09xxxxxxx2"]
+
+alarms: ['email', 'plurk', 'msn', 'sms']
+
+services: {"Google": "http://www.google.com/",
+           "Example": "http://www.example.com/"
+          }
+log_file: "monitor.log"
