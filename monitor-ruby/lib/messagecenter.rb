@@ -71,7 +71,7 @@ end
 
 def send_sms(id, password, sms_users, message)
   hra = ""
-  sms = TWSMSR.new(sms_account, sms_password)
+  sms = TWSMSR.new(id, password)
   sms_users.each do |m|
     if hr = sms.sendSMS(m, message) != ""
       hra += "#{m} #{hr}; "
