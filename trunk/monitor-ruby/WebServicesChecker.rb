@@ -21,8 +21,8 @@ class WebServicesChecker
       puts "redir to: #{response['location']}"
       fetch(response['location'], limit - 1)
     else
-      puts "#{@now_service} error!!"
-      return false
+      puts "#{@now_service} error!! (#{response})"
+      return "#{@now_service}(#{response.code})"
     end
   end
 
@@ -34,13 +34,14 @@ class WebServicesChecker
     services = conf["services"]
     services.each do |s, url|
       @now_service = s
-      if fetch(url) == false then
+      hr = fetch(url)
+      if hr != true then
         retry_count += 1
         if retry_count < retry_max then
           sleep wait_sec
           redo
         else
-          error_services += " #{@now_service}"
+          error_services += " #{hr}"
         end
       end
       retry_count = 0
