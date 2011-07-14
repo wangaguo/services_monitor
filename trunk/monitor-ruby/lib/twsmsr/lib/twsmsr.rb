@@ -65,8 +65,10 @@ class TWSMSR
     @send_options[:mobile], @send_options[:message] = mobile.gsub(/-/, ""), message
     self.check_send_val
     (raise ArgumentError, "dlvtime is invalid";return false) unless self.check_date("dlvtime") if opt[:type] =~ /^dlv$/
-    @send_options.merge!(opt).each{|k, v| args << k.to_s + "=" + CGI::escape(v.to_s)}
+    #@send_options.merge!(opt).each{|k, v| args << k.to_s + "=" + CGI::escape(v.to_s)}
+    @send_options.merge!(opt).each{|k, v| args << k.to_s + "=" + URI::escape(v.to_s)}
     url = @@SEND_URL + "username=" + @uname + "&password=" + @upwd + "&" + args.join("&")
+    puts url
     return self.check_response(Net::HTTP.get(URI.parse(url)))
   end
   
@@ -99,11 +101,12 @@ class TWSMSR
   protected
   
   def check_response(resp, type="send")
-    resp =~ /^resp=(\d?),/
-    return @@query_errors[$1.to_sym] if type =~ /^query$/
-    return @@send_errors[$1.to_sym] if $1.to_i < 0
-    @query_options[:msgid] = $1.to_s
-    return $1.to_s
+    resp =~ /^resp=(-?\d*)/
+    err = $1
+    return @@query_errors[err.to_sym] if type =~ /^query$/
+    return @@send_errors[err.to_sym] if err.to_i < 0
+    @query_options[:msgid] = err.to_s
+    return err.to_s
   end
   
   def check_send_val
@@ -126,5 +129,30 @@ class TWSMSR
         return true if Date.valid_civil?(d.year, d.month, d.day)
     end
     return false
+  end
+
+  def method_missing(m, *args, &block)
+    case m.to_s
+      when "send_option"
+        args[0].each do |key, value|
+          if @send_options[key] == nil
+            return "send_option #{key} is not exist."
+          else
+            @send_options[key] = value
+          end
+        end
+        return true
+      when "query_options"
+        args[0].each do |key, value|
+          if @query_options[key] == nil
+            return "query_options #{key} is not exist."
+          else
+            @query_options[key] = value
+          end
+        end
+        return true
+      else
+        return "No method called #{m} here."
+    end
   end
 end
