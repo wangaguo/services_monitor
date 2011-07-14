@@ -1,7 +1,7 @@
 $:.unshift(File.join(File.dirname(__FILE__)))
 require 'msn/msn'
 require 'net/smtp'
-require 'plurk/plurk'
+#require 'plurk/plurk'
 require 'twsmsr/twsmsr'
 
 def send_email(from, to, subject, message)
@@ -72,8 +72,9 @@ end
 def send_sms(id, password, sms_users, message)
   hra = ""
   sms = TWSMSR.new(id, password)
+  sms.send_option(:encoding => "lbig5")
   sms_users.each do |m|
-    if hr = sms.sendSMS(m, message) != ""
+    if (hr = sms.sendSMS(m, message)) != ""
       hra += "#{m} #{hr}; "
     end
   end
