@@ -1,5 +1,6 @@
 class WebServicesChecker 
   require 'net/http'
+
   @now_service = ""
 
   def fetch(uri_str, limit = 10)
@@ -7,10 +8,13 @@ class WebServicesChecker
     raise ArgumentError, 'HTTP redirect too deep' if limit == 0
 
     begin
-      response = Net::HTTP.get_response(URI.parse(uri_str))
+      response = nil
+      Timeout::timeout(20) do |length|
+        response = Net::HTTP.get_response(URI.parse(uri_str))
+      end
     rescue
       puts $!
-      return false
+      return "#{@now_service}(#{$!})" 
     end
 
     case response
@@ -26,32 +30,47 @@ class WebServicesChecker
     end
   end
 
-  def checker(conf)
-    retry_max = 5 
-    retry_count = 0
-    wait_sec = 5
-    error_services = ""
-    services = conf["services"]
-    services.each do |s, url|
-      @now_service = s
-      hr = fetch(url)
-      if hr != true then
-        retry_count += 1
-        if retry_count < retry_max then
-          sleep wait_sec
-          redo
-        else
-          error_services += " #{hr}"
-        end
-      end
-      retry_count = 0
-    end
+  def checker(conf, log)
+    log.info ">>> Begin the WebServicesChecker."
+    begin
+     retry_max = conf["retry_max"] || 1 
+     wait_sec = conf["wait_sec"] || 1 
+     retry_count = 0
+     error_services = ""
+     fetch_total = 0
+     fetch_retry = 0
 
-    if error_services != "" then
-      return "services failed: #{error_services}"
-    else
-      return ""
+     services = conf["services"] || []
+     services.each do |s, url|
+       @now_service = s
+       fetch_s = Time.now
+       hr = fetch(url)
+       fetch_e = Time.now 
+       fetch_retry += fetch_e - fetch_s 
+       puts "run time: #{fetch_retry}s"
+       if hr != true then
+         retry_count += 1
+         if retry_count < retry_max then
+           sleep wait_sec
+           redo
+         else
+           error_services += " #{hr}"
+         end
+       end
+       fetch_total += fetch_retry
+       #log.info "#{s}, #{fetch_retry}s"
+       fetch_retry = 0
+       retry_count = 0
+     end
+ 
+     log.info "fetch total time: #{fetch_total}s"
+     if error_services != "" then
+       return "services failed: #{error_services}"
+     else
+       return ""
+     end
+    rescue
+      return "#{$!}"
     end
   end
-
 end
