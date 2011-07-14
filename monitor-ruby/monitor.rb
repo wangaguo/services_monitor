@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby19
 
 require 'rubygems'
 require 'yaml'
@@ -23,7 +23,7 @@ def send_message(message, conf, log)
           email_to = conf["email_to"]
           
           send_email(email_from, email_to, subject, message)
-          logmsg = "[send_email] #{email_to}"
+          logmsg = "[send_email] #{email_to.inspect.to_s}"
           log.info logmsg 
           puts logmsg 
         when "plurk" then
@@ -57,19 +57,32 @@ def send_message(message, conf, log)
             puts logmsg 
           end
         when "sms" then
-          sms_account = conf["sms_account"]
-          sms_password = conf["sms_password"]
-          sms_users = conf["sms_users"] 
-    
-          logmsg = "[send_sms] #{sms_users.inspect.to_s}"
-          log.info logmsg 
-          puts logmsg 
+          #before sms resend will check the sms_time_file.
+          sms_time_file = "sms_send_time.txt"
+          sms_last_time = 0
+          if File::exists?(sms_time_file)
+            f = File.open(sms_time_file)
+            sms_last_time = f.read.to_i
+          end
 
-          hr = send_sms(sms_account, sms_password, sms_users, subject + "\n" + message)
-          if hr != ""
-            logmsg = "[send_sms status] #{hr}"
-            log.error logmsg 
+          if (Time.now.to_i - sms_last_time) > (60*conf["sms_resend_min"].to_i)
+	    f = File.new(sms_time_file, "w")
+            f.write(Time.now.to_i.to_s)
+            f.close
+            sms_account = conf["sms_account"]
+            sms_password = conf["sms_password"]
+            sms_users = conf["sms_users"] 
+      
+            logmsg = "[send_sms] #{sms_users.inspect.to_s}"
+            log.info logmsg 
             puts logmsg 
+
+            hr = send_sms(sms_account, sms_password, sms_users, subject + "\n" + message)
+            if hr != ""
+              logmsg = "[send_sms status] #{hr}"
+              log.error logmsg 
+              puts logmsg 
+            end
           end
         end
       end
@@ -84,15 +97,23 @@ def send_message(message, conf, log)
   end
 end
 
-conf = YAML.load_file('monitor.yaml')
-log = Logger.new(conf["log_file"])
-log.level = Logger::INFO
-log.formatter = Logger::Formatter.new
 begin
-  log.info ">>> Begin the WebServicesChecker."
-  message = WebServicesChecker.new.checker(conf)
+  #Init
+  conf = YAML.load_file('monitor.yaml')
+  log = Logger.new(conf["log_file"])
+  log.level = Logger::INFO
+  log.formatter = Logger::Formatter.new
+
+  #Send monitor ok mail every day.
+  if Time.now.strftime("%H:%M") == conf["ok_mail_time"]
+    send_email("wangaguo@fang.org", conf["debug_mail_to"], "Monitor ok", "Monitor is ok.")
+  end
+
+  #Start check.
+  message = WebServicesChecker.new.checker(conf, log)
   send_message(message, conf, log) 
 rescue
-  log.error $!
-  puts "Some error occur."
+  mail_msg = "#{$!}\n\n#{$@}"
+  send_email("wangaguo@fang.org", conf["debug_mail_to"], "Monitor debug @", mail_msg)
+  puts "Some error occur. #{$!}"
 end
