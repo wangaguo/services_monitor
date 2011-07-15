@@ -31,7 +31,6 @@ class WebServicesChecker
   end
 
   def checker(conf, log)
-    log.info ">>> Begin the WebServicesChecker."
     begin
      retry_max = conf["retry_max"] || 1 
      wait_sec = conf["wait_sec"] || 1 
