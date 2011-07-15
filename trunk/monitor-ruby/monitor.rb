@@ -6,7 +6,8 @@ require "logger"
 $:.unshift(File.join(File.dirname(__FILE__)))
 require 'lib/messagecenter'
 Dir.chdir File.join(File.dirname(__FILE__))
-require 'WebServicesChecker'
+#require 'WebServicesChecker'
+#require 'SympaChecker'
 
 def send_message(message, conf, log)
   if(message != "")
@@ -106,14 +107,29 @@ begin
 
   #Send monitor ok mail every day.
   if Time.now.strftime("%H:%M") == conf["ok_mail_time"]
-    send_email("wangaguo@fang.org", conf["debug_mail_to"], "Monitor ok", "Monitor is ok.")
+    send_email(conf["email_from"], conf["debug_mail_to"], "Monitor ok", "Monitor is ok.")
   end
 
   #Start check.
-  message = WebServicesChecker.new.checker(conf, log)
+  message = ""
+  Dir["./Checker/*.rb"].each do |x| #Load each Checker
+    require File.join(File.dirname(x), File.basename(x, ".rb"))
+
+    logmsg = ">>> Run Checker -> #{File.basename(x, ".rb")}" 
+    log.info logmsg
+    puts logmsg
+
+    #Run Checker
+    message += "\n" if message != ""
+    message += eval("#{File.basename(x, ".rb")}.new.checker(conf, log)")
+
+    logmsg = "<<< End Checker -> #{File.basename(x, ".rb")}" 
+    log.info logmsg
+    puts logmsg
+  end
   send_message(message, conf, log) 
 rescue
   mail_msg = "#{$!}\n\n#{$@}"
-  send_email("wangaguo@fang.org", conf["debug_mail_to"], "Monitor debug @", mail_msg)
+  send_email(conf["email_from"], conf["debug_mail_to"], "Monitor debug @", mail_msg)
   puts "Some error occur. #{$!}"
 end
