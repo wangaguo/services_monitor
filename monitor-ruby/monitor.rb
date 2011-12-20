@@ -107,7 +107,7 @@ begin
 
   #Send monitor ok mail every day.
   if Time.now.strftime("%H:%M") == conf["ok_mail_time"]
-    send_email(conf["email_from"], conf["debug_mail_to"], "Monitor ok", "Monitor is ok.")
+    send_email(conf["email_from"], conf["debug_mail_to"], conf["ok_mail_subject"], "Monitor is ok.")
   end
 
   #Start check.

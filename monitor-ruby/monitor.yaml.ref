@@ -19,6 +19,7 @@ alarms: ['email', 'plurk', 'msn', 'sms']
 
 log_file: "monitor.log"
 debug_mail_to: ["name@example.com"]
+ok_mail_subject: "Monitor ok"
 ok_mail_time: "17:00"
 
 
