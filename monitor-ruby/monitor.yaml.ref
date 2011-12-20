@@ -24,8 +24,11 @@ ok_mail_time: "17:00"
 
 #Below is for Checker
 #For WebServicesChecker
+retry_max: 1  
+wait_sec: 1
 services: {"Google": "http://www.google.com/",
            "Example": "http://www.example.com/"
           }
+
 #For SympaChecker
 sympa_monitor_mail_to: ["monitor-sympa@lists.example.com"]
