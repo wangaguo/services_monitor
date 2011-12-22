@@ -1,6 +1,6 @@
 subject: "Monitor warning"
 email_from: "Monitor<contact@example.org>"
-email_to: "name@example.com"
+email_to: ["name@example.com", "name2@example.com"]
 
 plurk_account: "my_account"
 plurk_password: "my_password"
