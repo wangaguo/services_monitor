@@ -14,6 +14,7 @@ def send_message(message, conf, log)
     logmsg = "[fail] #{message}" 
     log.info logmsg 
     puts logmsg 
+    short_message = message.gsub(/{[^{]*}/, "")
 
     alarms = conf["alarms"]
     subject = conf["subject"]
@@ -78,7 +79,7 @@ def send_message(message, conf, log)
             log.info logmsg 
             puts logmsg 
 
-            hr = send_sms(sms_account, sms_password, sms_users, subject + "\n" + message)
+            hr = send_sms(sms_account, sms_password, sms_users, subject + "\n" + short_message)
             if hr != ""
               logmsg = "[send_sms status] #{hr}"
               log.error logmsg 

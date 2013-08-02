@@ -14,7 +14,7 @@ class WebServicesChecker
       end
     rescue
       puts $!
-      return "#{@now_service}(#{$!})" 
+      return "#{@now_service}{#{$!}}"
     end
 
     case response
@@ -26,7 +26,7 @@ class WebServicesChecker
       fetch(response['location'], limit - 1)
     else
       puts "#{@now_service} error!! (#{response})"
-      return "#{@now_service}(#{response.code})"
+      return "#{@now_service}{#{response.code}}"
     end
   end
 
@@ -53,6 +53,7 @@ class WebServicesChecker
            sleep wait_sec
            redo
          else
+           error_services += ";" if error_services != ""
            error_services += " #{hr}"
          end
        end
@@ -64,7 +65,7 @@ class WebServicesChecker
  
      log.info "fetch total time: #{fetch_total}s"
      if error_services != "" then
-       return "services failed: #{error_services}"
+       return "Web failed: #{error_services}"
      else
        return ""
      end
