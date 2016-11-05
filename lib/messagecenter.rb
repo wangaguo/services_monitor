@@ -1,8 +1,8 @@
 $:.unshift(File.join(File.dirname(__FILE__)))
-require 'msn/msn'
+# require 'msn/msn'
 require 'net/smtp'
-#require 'plurk/plurk'
-require 'twsmsr4/twsmsr4'
+# require 'plurk/plurk'
+# require 'twsmsr4/twsmsr4'
 
 def send_email(from, to, subject, message)
   msg = <<END_OF_MESSAGE
@@ -31,22 +31,22 @@ end
 
 def send_msn(id, password, users_email, message)
   conn = MSNConnection.new(id, password)
-  
+
   conn.signed_in = lambda { puts "Signed in" }
   conn.debuglog = nil
-  
+
   conn.new_chat_session = lambda do |tag, session|
     puts "*** new chat session created with tag '#{tag}'!"
     session.debuglog = nil
-   
+
     session.session_started = lambda {
       puts "Session with tag '" + tag + "' started!"
       session.say(message)
     }
-  
+
     session.start
   end
-  
+
   conn.start
   wait_count = 0
   while true
@@ -60,11 +60,11 @@ def send_msn(id, password, users_email, message)
            conn.start_chat(m[1]+"1", email)
            10.times do
              sleep 1
-           end 
+           end
         end
       end
       conn.close
-      return("") 
+      return("")
     end
   end
 end

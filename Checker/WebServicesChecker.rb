@@ -1,6 +1,7 @@
-class WebServicesChecker 
+class WebServicesChecker
   require 'net/http'
 
+  OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
   @now_service = ""
 
   def fetch(uri_str, limit = 10)
@@ -18,7 +19,7 @@ class WebServicesChecker
     end
 
     case response
-    when Net::HTTPSuccess, Net::HTTPUnauthorized then
+    when Net::HTTPSuccess, Net::HTTPUnauthorized, Net::HTTPNotImplemented then
       puts "#{@now_service} ok!!"
       return true
     when Net::HTTPRedirection then
@@ -32,8 +33,8 @@ class WebServicesChecker
 
   def checker(conf, log)
     begin
-     retry_max = conf["retry_max"] || 1 
-     wait_sec = conf["wait_sec"] || 1 
+     retry_max = conf["retry_max"] || 1
+     wait_sec = conf["wait_sec"] || 1
      retry_count = 0
      error_services = ""
      fetch_total = 0
@@ -44,8 +45,8 @@ class WebServicesChecker
        @now_service = s
        fetch_s = Time.now
        hr = fetch(url)
-       fetch_e = Time.now 
-       fetch_retry += fetch_e - fetch_s 
+       fetch_e = Time.now
+       fetch_retry += fetch_e - fetch_s
        puts "run time: #{fetch_retry}s"
        if hr != true then
          retry_count += 1
@@ -62,7 +63,7 @@ class WebServicesChecker
        fetch_retry = 0
        retry_count = 0
      end
- 
+
      log.info "fetch total time: #{fetch_total}s"
      if error_services != "" then
        return "Web failed: #{error_services}"

@@ -6,7 +6,7 @@ plurk_account: "my_account"
 plurk_password: "my_password"
 plurk_users: [user1id, user2id]
 
-msn_account: "my_account" 
+msn_account: "my_account"
 msn_password: "my_password"
 msn_users: ["user1@msn.com", "user2@msn.com"]
 
@@ -15,7 +15,8 @@ sms_password: "my_password"
 sms_users: ["09xxxxxxx1", "09xxxxxxx2"]
 sms_resend_min: 5
 
-alarms: ['email', 'plurk', 'msn', 'sms']
+# alarms: ['email', 'plurk', 'msn', 'sms']
+alarms: ['email']
 
 log_file: "monitor.log"
 debug_mail_to: ["name@example.com"]
@@ -25,7 +26,7 @@ ok_mail_time: "17:00"
 
 #Below is for Checker
 #For WebServicesChecker
-retry_max: 1  
+retry_max: 1
 wait_sec: 1
 services: {"Google": "http://www.google.com/",
            "Example": "http://www.example.com/"
