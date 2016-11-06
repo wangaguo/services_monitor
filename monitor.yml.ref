@@ -1,6 +1,13 @@
 subject: "Monitor warning"
 email_from: "Monitor<contact@example.org>"
-email_to: ["name@example.com", "name2@example.com"]
+email_to:
+  - name@example.com
+  - name2@example.com
+
+slack_bot:
+  token: your-token
+  channels:
+    - your-channel
 
 plurk_account: "my_account"
 plurk_password: "my_password"
@@ -15,8 +22,9 @@ sms_password: "my_password"
 sms_users: ["09xxxxxxx1", "09xxxxxxx2"]
 sms_resend_min: 5
 
-# alarms: ['email', 'plurk', 'msn', 'sms']
-alarms: ['email']
+# alarms: ['email', 'plurk', 'msn', 'sms', 'slack_bot']
+alarms:
+  - slack_bot
 
 log_file: "monitor.log"
 debug_mail_to: ["name@example.com"]

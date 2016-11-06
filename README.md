@@ -1,7 +1,7 @@
 # Services Monitor
 This is a monitoring tools.
 
-Your web services is being monitored. You've got an e-mail ( or plurk; msn; sms ) notice while the status code is incorrect.
+Your web services is being monitored. You've got an e-mail ( or plurk; msn; sms; slack_bot ) notice while the status code is incorrect.
 
 ## Usage
 * Copy monitor.yml.ref to monitor.yml.
@@ -16,4 +16,3 @@ Your web services is being monitored. You've got an e-mail ( or plurk; msn; sms 
 * rubymsn: MIT License, http://code.google.com/p/rubymsn/
 * plurk: Unknow License, http://github.com/xdite/plurk/
 * twsmsr: Unknow License, http://github.com/cfc/twsmsr/
-
