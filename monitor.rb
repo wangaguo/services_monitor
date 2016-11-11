@@ -21,11 +21,12 @@ begin
 
   #Send monitor ok mail every day.
   if Time.now.strftime("%H:%M") == CONF["ok_mail_time"]
-    send_email(CONF["email_from"], CONF["debug_mail_to"], CONF["ok_mail_subject"], "Monitor is ok.")
+    # send_email(CONF["email_from"], CONF["debug_mail_to"], CONF["ok_mail_subject"], "Monitor is ok.")
+    send_slack_bot('Hello! I am alive!') if CONF['alarms'].include?('slack_bot')
   end
 
   #Start check.
-  message = ""
+  message = ''
   Dir["./Checker/*.rb"].each do |x| #Load each Checker
     require File.join(File.dirname(x), File.basename(x, ".rb"))
 
@@ -33,16 +34,16 @@ begin
     logger(logmsg)
 
     #Run Checker
-    message += "\n" if message != ""
+    message += "\n" if message != ''
     message += eval("#{File.basename(x, ".rb")}.new.checker(CONF, LOG)")
 
     logmsg = "<<< End Checker -> #{File.basename(x, ".rb")}"
     logger(logmsg)
   end
-  send_message(message)
+  send_message(message) if message != ''
 rescue => e
   mail_msg = "#{e}\n\n#{e.backtrace}"
   # send_email(CONF["email_from"], CONF["debug_mail_to"], "Monitor debug @", mail_msg)
   logger(mail_msg, :error)
-  send_slack_bot("Monitor debug log\n" + mail_msg)
+  send_slack_bot("Monitor debug log\n" + mail_msg) if CONF['alarms'].include?('slack_bot')
 end
