@@ -6,6 +6,7 @@ require 'net/smtp'
 require 'slack-ruby-client'
 
 def send_email(from, to, subject, message)
+  logger("[send_email] #{to}")
   msg = <<END_OF_MESSAGE
 From: #{from}
 To: #{to.join(",")}

@@ -19,10 +19,10 @@ begin
   LOG.level = Logger::INFO
   LOG.formatter = Logger::Formatter.new
 
-  #Send monitor ok mail every day.
-  if Time.now.strftime("%H:%M") == CONF["ok_mail_time"]
-    # send_email(CONF["email_from"], CONF["debug_mail_to"], CONF["ok_mail_subject"], "Monitor is ok.")
-    send_slack_bot('Hello! I am alive!') if CONF['alarms'].include?('slack_bot')
+  #Send monitor ok every day.
+  if Time.now.strftime("%H:%M") == CONF['ok_time']
+    send_email(CONF['email_from'], CONF['ok_mail_to'], CONF['ok_mail_subject'], 'Hello! I am alive!') if CONF['ok_alarms'].include?('email')
+    send_slack_bot('Hello! I am alive!') if CONF['ok_alarms'].include?('slack_bot')
   end
 
   #Start check.
@@ -42,8 +42,8 @@ begin
   end
   send_message(message) if message != ''
 rescue => e
-  mail_msg = "#{e}\n\n#{e.backtrace}"
-  # send_email(CONF["email_from"], CONF["debug_mail_to"], "Monitor debug @", mail_msg)
   logger(mail_msg, :error)
-  send_slack_bot("Monitor debug log\n" + mail_msg) if CONF['alarms'].include?('slack_bot')
+  mail_msg = "#{e}\n\n#{e.backtrace}"
+  send_email(CONF["email_from"], CONF["ok_mail_to"], "Monitor debug @", mail_msg) if CONF['ok_alarms'].include?('email')
+  send_slack_bot("Monitor debug log\n" + mail_msg) if CONF['ok_alarms'].include?('slack_bot')
 end
