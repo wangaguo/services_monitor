@@ -42,8 +42,8 @@ begin
   end
   send_message(message) if message != ''
 rescue => e
-  logger(mail_msg, :error)
   mail_msg = "#{e}\n\n#{e.backtrace}"
+  logger(mail_msg, :error)
   send_email(CONF["email_from"], CONF["ok_mail_to"], "Monitor debug @", mail_msg) if CONF['ok_alarms'].include?('email')
   send_slack_bot("Monitor debug log\n" + mail_msg) if CONF['ok_alarms'].include?('slack_bot')
 end
