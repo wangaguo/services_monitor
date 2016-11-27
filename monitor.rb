@@ -21,8 +21,8 @@ begin
 
   #Send monitor ok every day.
   if Time.now.strftime("%H:%M") == CONF['ok_time']
-    send_email(CONF['email_from'], CONF['ok_mail_to'], CONF['ok_mail_subject'], 'Hello! I am alive!') if CONF['ok_alarms'].include?('email')
-    send_slack_bot('Hello! I am alive!') if CONF['ok_alarms'].include?('slack_bot')
+    send_email(CONF['email_from'], CONF['ok_mail_to'], CONF['ok_mail_subject'], CONF['ok_message']) if CONF['ok_alarms'].include?('email')
+    send_slack_bot(CONF['ok_message']) if CONF['ok_alarms'].include?('slack_bot')
   end
 
   #Start check.

@@ -32,6 +32,7 @@ ok_alarms:
   - email
 ok_mail_to: ["name@example.com"]
 ok_mail_subject: "Monitor ok"
+ok_message: "Hello! I am alive!"
 ok_time: "17:00"
 
 
