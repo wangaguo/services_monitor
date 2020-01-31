@@ -6,28 +6,29 @@ class WebServicesChecker
 
   def fetch(uri_str, limit = 10)
     puts "---> #{uri_str}"
-    raise ArgumentError, 'HTTP redirect too deep' if limit == 0
 
     begin
+      raise ArgumentError, 'HTTP redirect too deep' if limit == 0
+
       response = nil
       Timeout::timeout(20) do |length|
         response = Net::HTTP.get_response(URI.parse(uri_str))
       end
     rescue
-      puts $!
-      return "#{@now_service}{#{$!}}"
+      logger("#{@now_service} {#{$!}}", :error)
+      return "#{@now_service} {#{$!}}"
     end
 
     case response
     when Net::HTTPSuccess, Net::HTTPUnauthorized, Net::HTTPNotImplemented then
-      puts "#{@now_service} ok!!"
+      logger("#{@now_service} ok!!")
       return true
     when Net::HTTPRedirection then
       puts "redir to: #{response['location']}"
       fetch(response['location'], limit - 1)
     else
-      puts "#{@now_service} error!! (#{response})"
-      return "#{@now_service}{#{response.code}}"
+      logger("#{@now_service} (#{response.code})", :error)
+      return "#{@now_service} {#{response.code}}"
     end
   end
 
@@ -64,14 +65,14 @@ class WebServicesChecker
        retry_count = 0
      end
 
-     log.info "fetch total time: #{fetch_total}s"
+     logger("fetch total time: #{fetch_total}s")
      if error_services != "" then
        return "Web failed: #{error_services}"
      else
        return ""
      end
     rescue
-      return "#{$!}"
+      return "Exception: #{$!}"
     end
   end
 end
